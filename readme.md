@@ -142,30 +142,30 @@ var user = {
 ```
 
 ### Factories
-- Functions that return objects that have methods (esp objects w/ varying prototypes)
+Factory functions return objects that have methods (esp objects w/ varying prototypes). Conceived as a DRY way to abstract the object creation process.
+
 - Good for deferred object construction
 - Good for creating complex objects
 
+- Potential inefficiency: methods created on the factory function are copied to all objects
+- Lacking type determination: the new object instances created by the factory are typed as 'Object'; no indication of their content
+
 Examples:
 ```
-function makeThing(name, status) {
-  function ready() {
-    return "Thing is ready";
-  }
-  function unready() {
-    return "Thing ain't ready";
+function createCar( make, model ) {
+  var o = new Object();
+  
+  o.make = make;
+  o.model = model;
+  o.sayCarInfo = function() {
+    alert( 'I own this abomination: ' + this.make + ' ' + this.model );
   }
   
-  return {
-    name: name,
-    isReady: isReady,
-    aboutThing: function() {
-      return this.isReady ? ready() : unready();
-    };
-  }
+  return o;
 }
 
-var myThing = createThing("Bob", true);
+var bobCar = createCar( 'Austin', 'Allegro' );
+var daveCar = createCar( 'FSO', 'Polonez' );
 ```
 
 ### Mixins / decorators(OO)
