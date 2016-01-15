@@ -16,10 +16,14 @@ Compiling some JS design pattern info, use cases etc
   - [Revealing module pattern](#revealing module pattern)
 - [Singletons](#singletons)
 - [Factories](#factories)
+- [Constructors](#constructor)
+- [Combination Constructor/Prototype](#combination constructor/prototype)
+- ~~[Dynamic Prototype](#dynamic prototype)~~
+- [OLOO](#oloo)
 - [Mixins/decorators](#mixins/decorators)
 - [Observer](#observer)
 - [IIFEs](#iifes)
-- [jQuery examples](#jquery examples)
+- ~~[jQuery examples](#jquery examples)~~
 
 
 ## Categories of patterns
@@ -148,7 +152,7 @@ Factory functions return objects that have methods (esp objects w/ varying proto
 - Good for creating complex objects
 
 - Potential inefficiency: methods created on the factory function are copied to all objects
-- Lacking type determination: the new object instances created by the factory are typed as 'Object'; no indication of their content
+- Lacking type determination: the new object instances created by the factory are typed as 'Object'; no indication of their content (solved by the Constructor pattern)
 
 Examples:
 ```JavaScript
@@ -167,6 +171,139 @@ function createCar( make, model ) {
 var bobCar = createCar( 'Austin', 'Allegro' );
 var daveCar = createCar( 'FSO', 'Polonez' );
 ```
+
+### Constructor
+
+- The constructor pattern solves the Factory pattern's type determinism issue -
+`alert( bobCar.constructor === Car );` is true in the Constructor pattern, but would be false in Factory
+- Similar inefficiency issues to the Factory pattern, which leads to the combination Constructor/Prototype pattern
+
+### Combination Constructor/Prototype
+
+- Solves efficiency issues of Factory / Constructor patterns by using prototypal inheritance (prototypal delegation really)
+- Allows for unique (non-shared) instance properties created within a constructor function as well as shared props and mewthods on the constructor functions prototype
+
+Example:
+
+```javascript
+// constructor function to make car objects
+function Car( make, model ) {
+  this.make = make;
+  this.model = model;
+}
+
+// constructor prototype to share props and methods
+Car.prototype.sayCar = function() {
+  alert( 'I have a spicy ' + this.make + ' ' this.model );
+}
+
+// create 2 car objects
+var bobCar = new Car( 'Pagani', 'Zonda' ),
+    daveCar = new Car( 'Ferrari', 'F50' );
+
+// call method on bob's car
+bobCar.sayCar(); // el z0nd
+```
+
+**Note about prototypes**: if you assign your constructor's prototype to an object literal instead of using dot notation, you'll overwrite the default `constructor` property. The object literal tells JS to _replace_ the prototype with a new object, rather than _augment_ the existing prototype. Because `constructor` is a default property on all prototypes, it gets removed when you replace the prototype with a new object. IF you want to assign a new object to a prototype and maintain the constructor relationship, you need to recreate the `constructor` property and assign it the proper value -- see below:
+
+Create prototype using object literal without an explicit constructor:
+
+```js
+
+
+function Car( make, model ) {
+  this.make = make;
+  this.model = model;
+}
+
+// create constructor prototype with object literal
+Car.prototype = {
+  sayCar = function() {
+    alert( 'I have a spicy ' + this.make + ' ' this.model );
+  }
+}
+
+var johnCar = new Car( 'Ford', 'F150' );
+
+// get constructor on john's car
+alert( johnCar.constructor === Car ); // false
+alert( johnCar.constructor === Object ); // true
+```
+Create prototype using object literal and create an explicit constructor:
+```js
+function Car( make, model ) {
+  this.make = make;
+  this.model = model;
+}
+
+// create constructor prototype with object literal
+Car.prototype = {
+  constructor: Car,
+  sayCar: function() {
+    alert( 'I have a ' + this.make + ' ' + this.model );
+  }
+};
+
+var johnCar = new Car( 'Ford', 'F150' );
+
+// get constructor on john's car
+alert( johnCar.constructor === Car ); // true
+alert( johnCar.constructor === Object ); // false
+```
+- Cuts down on repetition from using the dot notation
+- However assigning a new object to a prototype makes your code more complicated; you lose the ability to determine type
+
+...
+
+- Confusing separation of constructor and prototype. Leads to the Dynamic Prototype pattern
+
+### Dynamic Prototype
+
+...
+
+### OLOO
+
+A recent pattern that uses prototypical inheritance to create objects directly from other objects, rather than using constructor functions
+
+```javascript
+// constructor
+var Car = {
+  init: function( make, model ) {
+    this.make = make;
+    this.model = model;
+  },
+  sayCar: function() {
+    alert( 'I have this abomination: ' + this.make + ' ' + this.model );
+  }
+};
+
+// create 2 car objects
+var bobCar = Object.create(Car),
+    daveCar = Object.create(Car);
+    
+//call init method on each
+bobCar.init( 'Morris', 'Marina' );
+daveCar.init( 'AvtoVAZ', 'Lada' );
+
+// call method on daves car
+daveCar.sayCar(); // the mighty Lada
+```
+
+Ex:
+```javascript
+function Car( make, model ) {
+  this.make = make;
+  this.model = model;
+  this.sayCar = function() {
+    alert('I own this abomination: ' + this.make + ' ' + this.model );
+  };
+}
+
+var bobCar = new Car( 'Chrysler', 'PT Cruiser Cabriolet' );
+var daveCar = new Car( 'REVA' , 'G-Wiz' );
+```
+
 
 ### Mixins / decorators(OO)
 - Functions taking an object and adding aditional behaviour
@@ -205,6 +342,7 @@ in this example a namespace object is passed as a function parameter and public 
 An even more expanded example:
 ```JavaScript
 /*
+semicolon before function invocation is a safety net against concat scripts / other plugins which mightn't be closed properly
 namespace and undefined are passed to ensure:
 1. namespace can be modified locally and isn't overwritten outside of function context
 2. the value of undefined is guaranteed as truly undefined, to avoid issues with undefined being mutable pre-ES5
