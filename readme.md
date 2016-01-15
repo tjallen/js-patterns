@@ -46,7 +46,7 @@ The module pattern is based in part on object literals.
 - Similar to IIFE but an object is returned rather than a function
 
 Example:
-```
+```JavaScript
 var testModule = (function () {
  
   var counter = 0;
@@ -66,7 +66,7 @@ var testModule = (function () {
 })();
  ```
  Usage:
- ```
+ ```JavaScript
 // Increment our counter
 testModule.incrementCounter();
  
@@ -80,7 +80,7 @@ testModule.resetCounter();
 - Define our vars and functions in the private scope and return an anonymous object with pointers to the private functionality we want to reveal as public
 
 Example:
-```
+```JavaScript
 var myRevealingModule = (function () {
  
 var privateCounter = 0;
@@ -129,7 +129,7 @@ Negatives:
 Examples: 
 - jQuery: `$`
 - Object literals:
-```
+```JavaScript
 var user = {  
   firstName: 'Cunty',
   middleName: 'The'
@@ -151,7 +151,7 @@ Factory functions return objects that have methods (esp objects w/ varying proto
 - Lacking type determination: the new object instances created by the factory are typed as 'Object'; no indication of their content
 
 Examples:
-```
+```JavaScript
 function createCar( make, model ) {
   var o = new Object();
   
@@ -180,7 +180,7 @@ var daveCar = createCar( 'FSO', 'Polonez' );
 A popular approach to encapsulation from the global namespace
 
 Basic IIFE example:
-```
+```JavaScript
 // anon
 ( function() { // code })();
 
@@ -189,7 +189,7 @@ Basic IIFE example:
 ```
 Expanding on the first example:
 
-```
+```JavaScript
 var namespace = namespace || {};
 /*
 in this example a namespace object is passed as a function parameter and public methods and properties are assigned to it
@@ -203,7 +203,7 @@ in this example a namespace object is passed as a function parameter and public 
 ```
 
 An even more expanded example:
-```
+```JavaScript
 /*
 namespace and undefined are passed to ensure:
 1. namespace can be modified locally and isn't overwritten outside of function context
@@ -230,7 +230,7 @@ namespace and undefined are passed to ensure:
       console.log( 'Your msg: ' + msg );
     };
     
-    /* check wwhether "namespace" exists in the global namespace. if not, assign window.namespace an object literal
+    /* check whether "namespace" exists in the global namespace. if not, assign window.namespace an object literal
     */
 })( window.namespace = window.namespace || {} );
   
