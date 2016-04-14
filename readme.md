@@ -267,41 +267,28 @@ alert( johnCar.constructor === Object ); // false
 A recent pattern that uses prototypical inheritance to create objects directly from other objects, rather than using constructor functions
 
 ```javascript
-// constructor
-var Car = {
-  init: function( make, model ) {
-    this.make = make;
-    this.model = model;
-  },
-  sayCar: function() {
-    alert( 'I have this abomination: ' + this.make + ' ' + this.model );
-  }
+var Foo = {
+    init: function(who) {
+        this.me = who;
+    },
+    identify: function() {
+        return "I am " + this.me;
+    }
 };
 
-// create 2 car objects
-var bobCar = Object.create(Car),
-    daveCar = Object.create(Car);
-    
-//call init method on each
-bobCar.init( 'Morris', 'Marina' );
-daveCar.init( 'AvtoVAZ', 'Lada' );
+var Bar = Object.create(Foo);
 
-// call method on daves car
-daveCar.sayCar(); // the mighty Lada
-```
+Bar.speak = function() {
+    alert("Hello, " + this.identify() + ".");
+};
 
-Ex:
-```javascript
-function Car( make, model ) {
-  this.make = make;
-  this.model = model;
-  this.sayCar = function() {
-    alert('I own this abomination: ' + this.make + ' ' + this.model );
-  };
-}
+var b1 = Object.create(Bar);
+b1.init("b1");
+var b2 = Object.create(Bar);
+b2.init("b2");
 
-var bobCar = new Car( 'Chrysler', 'PT Cruiser Cabriolet' );
-var daveCar = new Car( 'REVA' , 'G-Wiz' );
+b1.speak(); // alerts: "Hello, I am b1."
+b2.speak(); // alerts: "Hello, I am b2."
 ```
 
 
